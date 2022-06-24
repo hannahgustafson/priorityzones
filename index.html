@@ -38,6 +38,11 @@
         <script src="data/EligibleZone_3.js"></script>
         <script src="data/PriorityZone_4.js"></script>
         <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+            highlightLayer.openPopup();
+        }
         var map = L.map('map', {
             zoomControl:true, maxZoom:25, minZoom:1
         })
@@ -88,6 +93,18 @@
         layer_LightBasemap_1;
         map.addLayer(layer_LightBasemap_1);
         function pop_SVCETerritory_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
             var popupContent = '<table>\
                     <tr>\
                         <td colspan="2">' + (feature.properties['STATEFP'] !== null ? autolinker.link(feature.properties['STATEFP'].toLocaleString()) : '') + '</td>\
@@ -150,6 +167,18 @@
         bounds_group.addLayer(layer_SVCETerritory_2);
         map.addLayer(layer_SVCETerritory_2);
         function pop_EligibleZone_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
             var popupContent = '<table>\
                     <tr>\
                         <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
@@ -189,9 +218,26 @@
         bounds_group.addLayer(layer_EligibleZone_3);
         map.addLayer(layer_EligibleZone_3);
         function pop_PriorityZone_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
             var popupContent = '<table>\
                     <tr>\
-                        <td colspan="2">' + (feature.properties['TargetArea'] !== null ? autolinker.link(feature.properties['TargetArea'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Priority Zone ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Number of MUD Units</th>\
+                        <td>' + (feature.properties['MUD_Units'] !== null ? autolinker.link(feature.properties['MUD_Units'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             layer.bindPopup(popupContent, {maxHeight: 400});
@@ -209,7 +255,7 @@
                 fill: true,
                 fillOpacity: .55,
                 fillColor: 'rgba(120,190,54,1.0)',
-                interactive: false,
+                interactive: true,
             }
         }
         map.createPane('pane_PriorityZone_4');
@@ -217,7 +263,7 @@
         map.getPane('pane_PriorityZone_4').style['mix-blend-mode'] = 'normal';
         var layer_PriorityZone_4 = new L.geoJson(json_PriorityZone_4, {
             attribution: '',
-            interactive: false,
+            interactive: true,
             dataVar: 'json_PriorityZone_4',
             layerName: 'layer_PriorityZone_4',
             pane: 'pane_PriorityZone_4',
@@ -239,6 +285,16 @@
         var baseMaps = {};
         L.control.layers(baseMaps,{'<img src="legend/PriorityZone_4.png" /> Priority Zone': layer_PriorityZone_4,'<img src="legend/EligibleZone_3.png" /> Eligible Zone': layer_EligibleZone_3,'<img src="legend/SVCETerritory_2.png" /> SVCE Territory': layer_SVCETerritory_2,"Light Basemap": layer_LightBasemap_1,"Google Basemap": layer_GoogleBasemap_0,},{collapsed:false}).addTo(map);
         setBounds();
+        resetLabels([layer_PriorityZone_4]);
+        map.on("zoomend", function(){
+            resetLabels([layer_PriorityZone_4]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_PriorityZone_4]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_PriorityZone_4]);
+        });
         </script>
     </body>
 </html>
